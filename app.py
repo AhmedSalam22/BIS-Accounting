@@ -50,6 +50,15 @@ def prepare_equity_statement():
     drawings = df.query('Type_x == "Drawings"')["Helper"].sum()
     return  investment , drawings 
 
+def prepare_finacial_statement():
+    assest = df.query('Type_x == "Assest"').pivot_table(values="Helper" , index="Account" , columns="Normal Balance" ,aggfunc=np.sum, fill_value=0)
+    total_assest= assest.sum()
+    assest[""] = ""
+    
+    liabilities = df.query('Type_x == "liabilities"').pivot_table(values="Helper" , index="Account" , columns="Normal Balance" ,aggfunc=np.sum, fill_value=0)
+    total_liabilities = liabilities.sum()
+    return assest , total_assest , liabilities ,total_liabilities
+
 @st.cache(persist=True)
 def account_in_ledger(name):
     account = df[["Account" , "Date" , "Account Title and Explanation"  , "Debit" , "Credit" , "Helper"]].query('Account == @name')
@@ -92,6 +101,19 @@ if st.sidebar.checkbox("Prepare  financial statements" , False):
                 """.format(investment = investment , amount = amount , drawings = drawings , equity =  equity)
     st.markdown(markdown)
 
+    st.header('Financial statements')
+    assest , total_assest , liabilities ,total_liabilities = prepare_finacial_statement()
+
+    st.markdown("#### Assest")
+    st.table(assest)
+    st.markdown("#### Tota Assest amount")
+    st.table(total_assest)
+    st.markdown("#### liabilities")
+    st.table(liabilities)
+    st.markdown("#### Tota liabilities amount")
+    st.table(total_liabilities)
+    st.markdown("#### Owner's Equity:\n{}".format(equity))
+
 #  Ledger
 if st.sidebar.checkbox("Show Ledger" , False):
     account = st.sidebar.selectbox("Account" , list(df.Account.unique()))
@@ -100,4 +122,6 @@ if st.sidebar.checkbox("Show Ledger" , False):
     st.table(ledger)
 
 
+
+st.markdown("<br><br>" , True)
 st.markdown("##### copyright@Ahmed Maher Fouzy Mohamed Salam 221999")
