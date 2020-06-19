@@ -38,8 +38,11 @@ def prepare_equity_statement():
 
 @st.cache(persist=True)
 def account_in_ledger(name):
-    return df[["Account" , "Date" , "Account Title and Explanation"  , "Debit" , "Credit"]].query('Account == @name').iloc[: , 1:]
-
+    account = df[["Account" , "Date" , "Account Title and Explanation"  , "Debit" , "Credit" , "Helper"]].query('Account == @name')
+    account["Balance"] = np.cumsum(df["Helper"])
+    account.drop(columns=["Account" , "Helper"]  , inplace =True)
+    return account
+    
 # Financial statements
 if st.sidebar.checkbox("Prepare  financial statements" , False):
     st.header("Trial Balance")
