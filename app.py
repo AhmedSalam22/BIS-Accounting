@@ -51,11 +51,13 @@ def account_in_ledger(name):
 if st.sidebar.checkbox("Prepare  financial statements" , False):
     st.header("Trial Balance")
     trial_balance , trial_balance_sum = prepare_trial_balance()
-    st.write(trial_balance , trial_balance_sum)
+    st.table(trial_balance )
+    st.write(trial_balance_sum)
 
     st.header("Net Income")
     net_income  , net_income_sum = prepare_net_income()
-    st.write(net_income , net_income_sum )
+    st.table(net_income)
+    st.write(net_income_sum)
 
     amount = net_income_sum[1] - net_income_sum[0]
     if amount > 0 :
@@ -82,7 +84,8 @@ if st.sidebar.checkbox("Show Ledger" , False):
     account = st.sidebar.selectbox("Account" , list(df.Account.unique()))
     st.header("Ledger for {account}".format(account= account))
     ledger = account_in_ledger(account)
-    st.write(ledger)
+    st.table(ledger)
+
 
 
 st.markdown("##### copyright@Ahmed Maher Fouzy Mohamed Salam 221999")
