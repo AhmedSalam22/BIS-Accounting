@@ -78,10 +78,21 @@ if st.sidebar.checkbox("Prepare  financial statements" , False):
     st.table(trial_balance )
     st.write(trial_balance_sum)
 
+    # add bar chart
+    trial_balance.plot(kind="bar" , figsize=(5,15))
+    st.pyplot()
+
+
+
+    st.title("")
     st.header("Net Income")
     net_income  , net_income_sum = prepare_net_income()
     st.table(net_income)
     st.write(net_income_sum)
+    # add pie chart
+    net_income_sum.plot(kind="pie" , figsize= (5,5) )
+    st.pyplot()
+
 
     amount = net_income_sum[1] - net_income_sum[0]
     if amount > 0 :
