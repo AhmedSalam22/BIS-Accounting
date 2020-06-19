@@ -36,6 +36,10 @@ def prepare_equity_statement():
     drawings = df.query('Type_x == "Drawings"')["Helper"].sum()
     return  investment , drawings 
 
+@st.cache(persist=True)
+def account_in_ledger(name):
+    return df[["Account" , "Date" , "Account Title and Explanation"  , "Debit" , "Credit"]].query('Account == @name').iloc[: , 1:]
+
 # Financial statements
 if st.sidebar.checkbox("Prepare  financial statements" , False):
     st.header("Trial Balance")
@@ -65,5 +69,13 @@ if st.sidebar.checkbox("Prepare  financial statements" , False):
                 | Owner's Equity is equal to        |               |    {equity}  |
                 """.format(investment = investment , amount = amount , drawings = drawings , equity =  equity)
     st.markdown(markdown)
+
+#  Ledger
+if st.sidebar.checkbox("Show Ledger" , False):
+    account = st.sidebar.selectbox("Account" , list(df.Account.unique()))
+    st.header("Ledger for {account}".format(account= account))
+    ledger = account_in_ledger(account)
+    st.write(ledger)
+
 
 st.markdown("##### copyright@Ahmed Maher Fouzy Mohamed Salam 221999")
