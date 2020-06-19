@@ -4,22 +4,26 @@ import numpy as np
 
 
 st.title("Accounting process Automation for sole proprietorship ")
-path = st.text_input("please input the file path")
+# path = st.text_input("please input the file path")
+
+uploaded_file = st.file_uploader("Choose a xlsx file", type="xlsx")
+
 
 @st.cache(persist=True)
-def load_data(path):
-    accounts = pd.read_excel(path)
-    journal = pd.read_excel(path , sheet_name=1)
+def load_data(uploaded_file):
+    accounts = pd.read_excel(uploaded_file)
+    journal = pd.read_excel(uploaded_file , sheet_name=1)
     df = pd.merge(accounts , journal , how='outer' , left_on="Account_ID" , right_on="Account_id" )
     df.drop(columns=["Account_ID", "Account_id" , "Type_y" , "Helper2", "Balance"] , inplace= True)
 
     return df
 
-if path != "" :
-    df = load_data(path)
+if uploaded_file != None :
+    df = load_data(uploaded_file)
     
 if st.checkbox("Show raw data" , False):
     st.write(df)
+
 
 def prepare_trial_balance():
     trial_balance = df.pivot_table(values="Helper" , index="Account" , columns="Normal Balance" ,aggfunc=np.sum, fill_value=0)
@@ -42,7 +46,7 @@ def account_in_ledger(name):
     account["Balance"] = np.cumsum(df["Helper"])
     account.drop(columns=["Account" , "Helper"]  , inplace =True)
     return account
-    
+
 # Financial statements
 if st.sidebar.checkbox("Prepare  financial statements" , False):
     st.header("Trial Balance")
