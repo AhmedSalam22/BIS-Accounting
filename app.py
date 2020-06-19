@@ -1,0 +1,50 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+
+
+st.title("Accounting process Automation for sole proprietorship ")
+path = st.text_input("please input the file path")
+
+@st.cache(persist=True)
+def load_data(path):
+    accounts = pd.read_excel(path)
+    journal = pd.read_excel(path , sheet_name=1)
+    df = pd.merge(accounts , journal , how='outer' , left_on="Account_ID" , right_on="Account_id" )
+    df.drop(columns=["Account_ID", "Account_id" , "Type_y" , "Helper2", "Balance"] , inplace= True)
+
+    return df
+
+if path != "" :
+    df = load_data(path)
+    
+if st.checkbox("Show raw data" , False):
+    st.write(df)
+
+def prepare_trial_balance():
+    trial_balance = df.pivot_table(values="Helper" , index="Account" , columns="Normal Balance" ,aggfunc=np.sum, fill_value=0)
+    return trial_balance , trial_balance.sum()
+
+
+def prepare_net_income():
+    net_income = df.query('Type_x == "Revenue" or Type_x == "Expenses" ').pivot_table(index = "Account" , columns="Type_x" , values="Helper" , aggfunc=np.sum).sort_values('Revenue' , ascending=False)
+    return net_income , net_income.sum()
+
+# Financial statements
+if st.sidebar.checkbox("Prepare  financial statements" , False):
+    st.header("Trial Balance")
+    trial_balance , trial_balance_sum = prepare_trial_balance()
+    st.write(trial_balance , trial_balance_sum)
+
+    st.header("Net Income")
+
+    net_income  , net_income_sum = prepare_net_income()
+    st.write(net_income , net_income_sum )
+
+    amount = net_income_sum[1] - net_income_sum[0]
+    if amount > 0 :
+        st.write("There are a Net income by: {}".format(amount))
+    else:
+        st.write("There are a Net Loss by: {}".format(amount))
+
+st.markdown("##### copyright@Ahmed Maher Fouzy Mohamed Salam 221999")
