@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-
+import datetime
 
 st.title("Accounting process Automation for sole proprietorship ")
 # path = st.text_input("please input the file path")
@@ -20,6 +20,16 @@ def load_data(uploaded_file):
 
 if uploaded_file != None :
     df = load_data(uploaded_file)
+    # filter by date if user want 
+    if st.sidebar.checkbox("Do you want to filter data by date between?" , False):
+        d = st.sidebar.date_input("Start date", datetime.date(2019, 7, 6))
+        d2 = st.sidebar.date_input("End date", datetime.date(2019, 8, 6))
+        if st.sidebar.button("Filter"):
+            df = df.query('Date >= @d and Date <= @d2')
+            st.sidebar.header("Filter is applied")
+        else:
+            st.sidebar.header("No filter")
+
     
 if st.checkbox("Show raw data" , False):
     st.write(df)
@@ -46,6 +56,9 @@ def account_in_ledger(name):
     account["Balance"] = np.cumsum(df["Helper"])
     account.drop(columns=["Account" , "Helper"]  , inplace =True)
     return account
+
+
+
 
 # Financial statements
 if st.sidebar.checkbox("Prepare  financial statements" , False):
@@ -85,7 +98,6 @@ if st.sidebar.checkbox("Show Ledger" , False):
     st.header("Ledger for {account}".format(account= account))
     ledger = account_in_ledger(account)
     st.table(ledger)
-
 
 
 st.markdown("##### copyright@Ahmed Maher Fouzy Mohamed Salam 221999")
