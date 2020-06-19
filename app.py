@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import datetime
+import matplotlib.pyplot as plt
+
 
 st.title("Accounting process Automation for sole proprietorship ")
 # path = st.text_input("please input the file path")
@@ -120,6 +122,10 @@ if st.sidebar.checkbox("Show Ledger" , False):
     st.header("Ledger for {account}".format(account= account))
     ledger = account_in_ledger(account)
     st.table(ledger)
+    #Dynamic line chart
+    line_chart = ledger.iloc[: ,np.r_[0,4]]
+    line_chart.plot(x="Date" , y="Balance")
+    st.pyplot()
 
 
 
