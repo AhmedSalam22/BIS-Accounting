@@ -30,6 +30,12 @@ def prepare_net_income():
     net_income = df.query('Type_x == "Revenue" or Type_x == "Expenses" ').pivot_table(index = "Account" , columns="Type_x" , values="Helper" , aggfunc=np.sum).sort_values('Revenue' , ascending=False)
     return net_income , net_income.sum()
 
+
+def prepare_equity_statement():
+    investment = df.query('Type_x == "Investment"')["Helper"].sum()
+    drawings = df.query('Type_x == "Drawings"')["Helper"].sum()
+    return  investment , drawings 
+
 # Financial statements
 if st.sidebar.checkbox("Prepare  financial statements" , False):
     st.header("Trial Balance")
@@ -37,7 +43,6 @@ if st.sidebar.checkbox("Prepare  financial statements" , False):
     st.write(trial_balance , trial_balance_sum)
 
     st.header("Net Income")
-
     net_income  , net_income_sum = prepare_net_income()
     st.write(net_income , net_income_sum )
 
@@ -46,5 +51,19 @@ if st.sidebar.checkbox("Prepare  financial statements" , False):
         st.write("There are a Net income by: {}".format(amount))
     else:
         st.write("There are a Net Loss by: {}".format(amount))
+
+
+    st.header("Prepare owner's equity statements")
+    investment ,  drawings = prepare_equity_statement()
+    equity = investment + amount - drawings
+    markdown = """
+                | Owner's Equity Statement          |
+                |-----------------------------------|:-------------:|-------------:|
+                | Owner's capital investment        |               | {investment} |
+                | Add net income/substract net loss |    {amount}   |              |
+                | Less: Drawings                    |({drawings})   |              |
+                | Owner's Equity is equal to        |               |    {equity}  |
+                """.format(investment = investment , amount = amount , drawings = drawings , equity =  equity)
+    st.markdown(markdown)
 
 st.markdown("##### copyright@Ahmed Maher Fouzy Mohamed Salam 221999")
